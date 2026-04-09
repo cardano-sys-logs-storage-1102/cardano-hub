@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Matrix Hub</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+  <style>
+    :root {
+      --green:        #00ff41;
+      --green-dim:    #00c832;
+      --green-dark:   #003b0e;
+      --green-glow:   rgba(0, 255, 65, 0.18);
+      --glass-bg:     rgba(0, 10, 3, 0.55);
+      --glass-border: rgba(0, 255, 65, 0.18);
+      --glass-hover:  rgba(0, 255, 65, 0.08);
+      --text-primary: #c8ffd4;
+      --text-muted:   rgba(0, 255, 65, 0.45);
+      --text-dim:     rgba(0, 255, 65, 0.22);
+
+      --accent-fin:   #00ff41;
+      --accent-kan:   #00e5ff;
+      --accent-pom:   #ff6b35;
+      --accent-trk:   #aaff00;
+
+      --radius-card: 14px;
+      --transition:  0.3s cubic-bezier(.4,0,.2,1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: #000;
+      color: var(--text-primary);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    a { text-decoration: none; color: inherit; }
+
+    /* ── MATRIX CANVAS (full-screen background) ── */
+    #matrix-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ── VIGNETTE overlay — draws eye to center ── */
+    .vignette {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background: radial-gradient(
+        ellipse 75% 75% at 50% 50%,
+        transparent 30%,
+        rgba(0,0,0,0.55) 70%,
+        rgba(0,0,0,0.88) 100%
+      );
+    }
+
+    /* ── CENTER BLUR ZONE — blurs matrix behind content ── */
+    .blur-zone {
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: min(1060px, 96vw);
+      height: 85vh;
+      z-index: 2;
+      pointer-events: none;
+      backdrop-filter: blur(12px) brightness(0.4);
+      -webkit-backdrop-filter: blur(12px) brightness(0.4);
+      border-radius: 24px;
+      /* Subtle inner glow border */
+      box-shadow: inset 0 0 0 1px rgba(0,255,65,0.06);
+    }
+
+    /* ── PAGE WRAPPER ── */
+    .page {
+      position: relative;
+      z-index: 3;
+      max-width: 1060px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    /* ── GRID ── */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 18px;
+    }
+
+    /* ── CARD ── */
+    .card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      /* Glassmorphism */
+      background: var(--glass-bg);
+      backdrop-filter: blur(18px) saturate(1.2);
+      -webkit-backdrop-filter: blur(18px) saturate(1.2);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-card);
+      padding: 26px 26px 22px;
+      cursor: pointer;
+      overflow: hidden;
+      transition:
+        transform var(--transition),
+        border-color var(--transition),
+        box-shadow var(--transition),
+        background var(--transition);
+      opacity: 0;
+      animation: fadeUp 0.6s cubic-bezier(.4,0,.2,1) forwards;
+    }
+
+    .card:nth-child(1) { animation-delay: 0.1s; }
+    .card:nth-child(2) { animation-delay: 0.2s; }
+    .card:nth-child(3) { animation-delay: 0.3s; }
+    .card:nth-child(4) { animation-delay: 0.4s; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Scanline texture on cards */
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 3px,
+        rgba(0,255,65,0.012) 3px,
+        rgba(0,255,65,0.012) 6px
+      );
+      pointer-events: none;
+      border-radius: var(--radius-card);
+    }
+
+    /* Glow blob top-right */
+    .card::after {
+      content: '';
+      position: absolute;
+      top: -20px; right: -20px;
+      width: 100px; height: 100px;
+      border-radius: 50%;
+      background: var(--card-accent);
+      opacity: 0.06;
+      filter: blur(25px);
+      transition: opacity var(--transition), transform var(--transition);
+    }
+
+    .card:hover {
+      transform: translateY(-5px) scale(1.016);
+      background: rgba(0, 18, 6, 0.7);
+      border-color: var(--card-accent);
+      box-shadow:
+        0 0 20px rgba(0,255,65,0.08),
+        0 20px 40px rgba(0,0,0,0.5),
+        inset 0 1px 0 rgba(0,255,65,0.1);
+    }
+
+    .card:hover::after {
+      opacity: 0.18;
+      transform: scale(1.4);
+    }
+
+    /* ── Icon badge ── */
+    .card__icon-wrap {
+      width: 46px; height: 46px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.4);
+      border: 1px solid var(--glass-border);
+      margin-bottom: 18px;
+      color: var(--card-accent);
+      transition: background var(--transition), border-color var(--transition), box-shadow var(--transition);
+      position: relative;
+      z-index: 1;
+    }
+
+    .card:hover .card__icon-wrap {
+      border-color: var(--card-accent);
+      box-shadow: 0 0 12px rgba(0,255,65,0.2);
+    }
+
+    .card__label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--card-accent);
+      margin-bottom: 5px;
+      position: relative; z-index: 1;
+      opacity: 0.7;
+    }
+
+    .card__title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.28rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      position: relative; z-index: 1;
+    }
+
+    .card__desc {
+      font-size: 13px;
+      font-weight: 300;
+      color: var(--text-muted);
+      line-height: 1.55;
+      flex-grow: 1;
+      position: relative; z-index: 1;
+    }
+
+    .card__footer {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 22px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      color: var(--card-accent);
+      opacity: 0.6;
+      transition: opacity var(--transition), gap var(--transition);
+      position: relative; z-index: 1;
+    }
+
+    .card:hover .card__footer {
+      opacity: 1;
+      gap: 10px;
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+      margin-top: 56px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(0,255,65,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .footer__copy {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      color: var(--text-dim);
+      letter-spacing: 0.08em;
+    }
+
+    .footer__status {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      color: var(--green);
+      letter-spacing: 0.1em;
+      opacity: 0.6;
+    }
+
+    .footer__dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 6px var(--green);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; box-shadow: 0 0 6px var(--green); }
+      50%       { opacity: 0.4; box-shadow: 0 0 2px var(--green); }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      .page { padding: 0 14px 60px; }
+      .grid { grid-template-columns: 1fr; }
+      .blur-zone { width: 100%; border-radius: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="matrix-canvas"></canvas>
+
+<div class="vignette"></div>
+
+<div class="blur-zone"></div>
+
+<div class="page">
+
+  <div class="grid">
+
+    <a class="card"
+       href="https://cardano-sys-logs-storage-1102.github.io/Dashboard-Financeiro/"
+       style="--card-accent: var(--accent-fin);"
+       aria-label="Abrir Financeiro">
+      <div class="card__icon-wrap">
+        <i data-lucide="line-chart" style="width:20px;height:20px;"></i>
+      </div>
+      <span class="card__label">// gestão</span>
+      <h2 class="card__title">Financeiro</h2>
+      <p class="card__desc">Controle de receitas, despesas e metas financeiras em um só lugar.</p>
+      <div class="card__footer">
+        acessar_módulo
+        <i data-lucide="arrow-right" style="width:13px;height:13px;"></i>
+      </div>
+    </a>
+
+    <a class="card"
+       href="https://cardano-sys-logs-storage-1102.github.io/kanban/"
+       style="--card-accent: var(--accent-kan);"
+       aria-label="Abrir Kanban">
+      <div class="card__icon-wrap">
+        <i data-lucide="kanban" style="width:20px;height:20px;"></i>
+      </div>
+      <span class="card__label">// projetos</span>
+      <h2 class="card__title">Kanban</h2>
+      <p class="card__desc">Organize tarefas em colunas visuais e acompanhe o fluxo de trabalho.</p>
+      <div class="card__footer">
+        acessar_módulo
+        <i data-lucide="arrow-right" style="width:13px;height:13px;"></i>
+      </div>
+    </a>
+
+    <a class="card"
+       href="https://cardano-sys-logs-storage-1102.github.io/pomodoro/"
+       style="--card-accent: var(--accent-pom);"
+       aria-label="Abrir Pomodoro">
+      <div class="card__icon-wrap">
+        <i data-lucide="timer" style="width:20px;height:20px;"></i>
+      </div>
+      <span class="card__label">// foco</span>
+      <h2 class="card__title">Pomodoro</h2>
+      <p class="card__desc">Ciclos de trabalho e pausa para maximizar produtividade e concentração.</p>
+      <div class="card__footer">
+        acessar_módulo
+        <i data-lucide="arrow-right" style="width:13px;height:13px;"></i>
+      </div>
+    </a>
+
+    <a class="card"
+       href="https://cardano-sys-logs-storage-1102.github.io/tracker/"
+       style="--card-accent: var(--accent-trk);"
+       aria-label="Abrir Tracker">
+      <div class="card__icon-wrap">
+        <i data-lucide="activity" style="width:20px;height:20px;"></i>
+      </div>
+      <span class="card__label">// hábitos</span>
+      <h2 class="card__title">Tracker</h2>
+      <p class="card__desc">Monitore hábitos, metas diárias e progresso ao longo do tempo.</p>
+      <div class="card__footer">
+        acessar_módulo
+        <i data-lucide="arrow-right" style="width:13px;height:13px;"></i>
+      </div>
+    </a>
+
+  </div>
+  <footer class="footer">
+    <span class="footer__copy">matrix_hub · todos os sistemas operacionais</span>
+    <div class="footer__status">
+      <div class="footer__dot"></div>
+      ONLINE
+    </div>
+  </footer>
+
+</div>
+
+<script>
+  lucide.createIcons();
+
+  /* =====================================================
+     MATRIX RAIN — Canvas Animation
+  ===================================================== */
+  (function () {
+    const canvas  = document.getElementById('matrix-canvas');
+    const ctx     = canvas.getContext('2d');
+
+    const KATAKANA = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン';
+    const LATIN    = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const NUMS     = '0123456789';
+    const SYMS     = '@#$%&*<>[]{}|/\\';
+    const CHARS    = KATAKANA + LATIN + NUMS + SYMS;
+
+    const FONT_SIZE = 14;
+    let columns, drops, speeds, brightnesses;
+
+    function rand(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    function init() {
+      canvas.width  = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      columns      = Math.floor(canvas.width / FONT_SIZE);
+      drops        = new Array(columns).fill(0).map(() => rand(-canvas.height / FONT_SIZE, 0));
+      speeds       = new Array(columns).fill(0).map(() => rand(0.3, 1.0));
+      brightnesses = new Array(columns).fill(0).map(() => rand(0.4, 1.0));
+    }
+
+    function draw() {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.font = FONT_SIZE + 'px "Share Tech Mono", monospace';
+
+      for (let i = 0; i < columns; i++) {
+        const y = drops[i];
+        if (y < 0) { drops[i] += speeds[i]; continue; }
+
+        const yPx = Math.floor(y) * FONT_SIZE;
+
+        const leadChar = CHARS[Math.floor(Math.random() * CHARS.length)];
+        ctx.fillStyle = `rgba(220, 255, 230, ${brightnesses[i]})`;
+        ctx.fillText(leadChar, i * FONT_SIZE, yPx);
+
+        const trailChar = CHARS[Math.floor(Math.random() * CHARS.length)];
+        const alpha = brightnesses[i] * 0.65;
+        ctx.fillStyle = `rgba(0, 200, 50, ${alpha})`;
+        ctx.fillText(trailChar, i * FONT_SIZE, yPx - FONT_SIZE);
+
+        const alpha2 = brightnesses[i] * 0.3;
+        ctx.fillStyle = `rgba(0, 150, 30, ${alpha2})`;
+        ctx.fillText(CHARS[Math.floor(Math.random() * CHARS.length)], i * FONT_SIZE, yPx - FONT_SIZE * 2);
+
+        drops[i] += speeds[i];
+
+        if (yPx > canvas.height && Math.random() > 0.975) {
+          drops[i] = rand(-20, 0);
+          speeds[i]       = rand(0.3, 1.0);
+          brightnesses[i] = rand(0.4, 1.0);
+        }
+      }
+    }
+
+    init();
+    window.addEventListener('resize', init);
+    setInterval(draw, 35);
+  })();
+</script>
+
+</body>
+</html>
