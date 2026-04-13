@@ -23,6 +23,7 @@
       --accent-pom:   #ff6b35;
       --accent-trk:   #aaff00;
       --accent-dat:   #bf80ff;
+      --accent-cvs:   #ff80bf;
       --radius-card:  14px;
       --transition:   0.3s cubic-bezier(.4,0,.2,1);
     }
@@ -56,7 +57,7 @@
     .blur-zone {
       position: fixed; top: 50%; left: 50%;
       transform: translate(-50%, -50%);
-      width: min(1180px, 96vw); height: 85vh;
+      width: min(900px, 96vw); height: 85vh;
       z-index: 2; pointer-events: none;
       backdrop-filter: blur(12px) brightness(0.4);
       -webkit-backdrop-filter: blur(12px) brightness(0.4);
@@ -66,21 +67,30 @@
 
     .page {
       position: relative; z-index: 3;
-      max-width: 1180px; margin: 0 auto;
+      max-width: 900px; margin: 0 auto;
       padding: 0 24px 80px;
       min-height: 100vh;
       display: flex; flex-direction: column; justify-content: center;
     }
 
-    /* 5-column grid */
+    /* ── 2-ROW 3-COLUMN GRID ── */
     .grid {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: auto auto;
       gap: 14px;
     }
 
-    @media (max-width: 1020px) { .grid { grid-template-columns: repeat(3, 1fr); } }
-    @media (max-width: 660px)  { .grid { grid-template-columns: repeat(2, 1fr); } }
+    /* Row separator — subtle horizontal divider */
+    .grid-row-sep {
+      grid-column: 1 / -1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0,255,65,0.12), transparent);
+      margin: 2px 0;
+    }
+
+    @media (max-width: 740px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 480px) { .grid { grid-template-columns: 1fr; } }
 
     /* ── CARD ── */
     .card {
@@ -98,10 +108,13 @@
       animation: fadeUp 0.6s cubic-bezier(.4,0,.2,1) forwards;
     }
 
-    .card:nth-child(1) { animation-delay: 0.1s; }
-    .card:nth-child(2) { animation-delay: 0.2s; }
-    .card:nth-child(3) { animation-delay: 0.3s; }
-    .card:nth-child(4) { animation-delay: 0.4s; }
+    .card:nth-child(1) { animation-delay: 0.10s; }
+    .card:nth-child(2) { animation-delay: 0.18s; }
+    .card:nth-child(3) { animation-delay: 0.26s; }
+    /* row sep counts as child 4 */
+    .card:nth-child(5) { animation-delay: 0.34s; }
+    .card:nth-child(6) { animation-delay: 0.42s; }
+    /* flip-wrapper is child 7 */
 
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(20px); }
@@ -175,13 +188,136 @@
     .card:hover .card__footer { opacity: 1; gap: 9px; }
 
     /* ══════════════════════════════════════
+       CANVAS FLIP CARD
+    ══════════════════════════════════════ */
+
+    .canvas-flip-wrapper {
+      perspective: 1200px;
+      opacity: 0;
+      animation: fadeUp 0.6s cubic-bezier(.4,0,.2,1) 0.42s forwards;
+    }
+
+    .canvas-flip-inner {
+      position: relative; width: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.7s cubic-bezier(.4,0,.2,1);
+      border-radius: var(--radius-card);
+    }
+
+    .canvas-flip-wrapper.flipped .canvas-flip-inner { transform: rotateY(180deg); }
+
+    .canvas-flip-face {
+      position: absolute; inset: 0;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border-radius: var(--radius-card); overflow: hidden;
+    }
+
+    /* FRONT */
+    .canvas-flip-front {
+      display: flex; flex-direction: column;
+      background: var(--glass-bg);
+      backdrop-filter: blur(18px) saturate(1.2);
+      -webkit-backdrop-filter: blur(18px) saturate(1.2);
+      border: 1px solid var(--glass-border);
+      padding: 20px 16px 16px; cursor: pointer;
+      transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+    }
+
+    .canvas-flip-front::before {
+      content: ''; position: absolute; inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,255,65,0.012) 3px, rgba(0,255,65,0.012) 6px);
+      pointer-events: none;
+    }
+
+    .canvas-flip-front::after {
+      content: ''; position: absolute; top: -20px; right: -20px;
+      width: 100px; height: 100px; border-radius: 50%;
+      background: var(--accent-cvs); opacity: 0.06; filter: blur(25px);
+      transition: opacity var(--transition), transform var(--transition);
+    }
+
+    .canvas-flip-wrapper:not(.flipped) .canvas-flip-front:hover {
+      background: rgba(0,18,6,0.7); border-color: var(--accent-cvs);
+      box-shadow: 0 0 20px rgba(0,255,65,0.08), 0 20px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(0,255,65,0.1);
+    }
+
+    .canvas-flip-wrapper:not(.flipped) .canvas-flip-front:hover::after { opacity: 0.18; transform: scale(1.4); }
+
+    /* BACK */
+    .canvas-flip-back {
+      transform: rotateY(180deg);
+      background: #0d0d14;
+      border: 1px solid #2a1a2a;
+    }
+
+    /* CANVAS IFRAME BACK */
+    .canvas-back-wrap {
+      width: 100%; height: 100%; position: relative;
+      font-family: 'Share Tech Mono', monospace;
+      display: flex; flex-direction: column;
+    }
+
+    .canvas-back-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 12px;
+      border-bottom: 1px solid rgba(255, 128, 191, 0.15);
+      flex-shrink: 0; z-index: 10; position: relative;
+      background: rgba(13, 13, 20, 0.9);
+    }
+
+    .canvas-back-tag {
+      font-size: 8px; letter-spacing: 3px; color: rgba(255,128,191,0.5);
+      text-transform: uppercase;
+    }
+
+    .canvas-back-actions {
+      display: flex; gap: 6px; align-items: center;
+    }
+
+    .canvas-back-btn {
+      background: transparent; border: 1px solid rgba(255,128,191,0.25);
+      color: rgba(255,128,191,0.6); font-family: 'Share Tech Mono', monospace;
+      font-size: 8px; letter-spacing: 2px; padding: 3px 8px;
+      cursor: pointer; transition: all 0.2s; text-transform: uppercase;
+      border-radius: 4px;
+    }
+
+    .canvas-back-btn:hover { border-color: var(--accent-cvs); color: var(--accent-cvs); }
+
+    .canvas-back-btn.open-ext {
+      border-color: rgba(255,128,191,0.4); color: rgba(255,128,191,0.8);
+    }
+
+    .canvas-back-btn.open-ext:hover {
+      background: var(--accent-cvs); color: #000;
+    }
+
+    .canvas-iframe-wrap {
+      flex: 1; position: relative; overflow: hidden;
+      border-radius: 0 0 var(--radius-card) var(--radius-card);
+    }
+
+    .canvas-iframe-wrap iframe {
+      width: 100%; height: 100%; border: none;
+      display: block;
+    }
+
+    /* corner decorations reused */
+    .ccorner { position: absolute; width: 10px; height: 10px; border-color: var(--accent-cvs); border-style: solid; opacity: 0.3; z-index: 2; pointer-events: none; }
+    .ccorner.tl { top:7px; left:7px;     border-width: 1px 0 0 1px; }
+    .ccorner.tr { top:7px; right:7px;    border-width: 1px 1px 0 0; }
+    .ccorner.bl { bottom:7px; left:7px;  border-width: 0 0 1px 1px; }
+    .ccorner.br { bottom:7px; right:7px; border-width: 0 1px 1px 0; }
+
+    /* ══════════════════════════════════════
        POMODORO FLIP CARD
     ══════════════════════════════════════ */
 
     .flip-wrapper {
       perspective: 1200px;
       opacity: 0;
-      animation: fadeUp 0.6s cubic-bezier(.4,0,.2,1) 0.5s forwards;
+      animation: fadeUp 0.6s cubic-bezier(.4,0,.2,1) 0.50s forwards;
     }
 
     .flip-inner {
@@ -200,7 +336,6 @@
       border-radius: var(--radius-card); overflow: hidden;
     }
 
-    /* FRONT */
     .flip-front {
       display: flex; flex-direction: column;
       background: var(--glass-bg);
@@ -231,7 +366,6 @@
 
     .flip-wrapper:not(.flipped) .flip-front:hover::after { opacity: 0.18; transform: scale(1.4); }
 
-    /* BACK */
     .flip-back {
       transform: rotateY(180deg);
       background: #0d0d0d;
@@ -360,6 +494,8 @@
 <div class="page">
   <div class="grid">
 
+    <!-- ── ROW 1 ── -->
+
     <!-- 1. FINANCEIRO -->
     <a class="card" href="https://cardano-sys-logs-storage-1102.github.io/Dashboard-Financeiro/" style="--card-accent: var(--accent-fin);" aria-label="Abrir Financeiro">
       <div class="card__icon-wrap"><i data-lucide="line-chart" style="width:18px;height:18px;"></i></div>
@@ -369,7 +505,16 @@
       <div class="card__footer">acessar_módulo <i data-lucide="arrow-right" style="width:12px;height:12px;"></i></div>
     </a>
 
-    <!-- 2. KANBAN -->
+    <!-- 2. TRACKER -->
+    <a class="card" href="https://cardano-sys-logs-storage-1102.github.io/tracker/" style="--card-accent: var(--accent-trk);" aria-label="Abrir Tracker">
+      <div class="card__icon-wrap"><i data-lucide="activity" style="width:18px;height:18px;"></i></div>
+      <span class="card__label">// hábitos</span>
+      <h2 class="card__title">Tracker</h2>
+      <p class="card__desc">Monitore hábitos, metas diárias e progresso ao longo do tempo.</p>
+      <div class="card__footer">acessar_módulo <i data-lucide="arrow-right" style="width:12px;height:12px;"></i></div>
+    </a>
+
+    <!-- 3. KANBAN -->
     <a class="card" href="https://cardano-sys-logs-storage-1102.github.io/kanban/" style="--card-accent: var(--accent-kan);" aria-label="Abrir Kanban">
       <div class="card__icon-wrap"><i data-lucide="kanban" style="width:18px;height:18px;"></i></div>
       <span class="card__label">// projetos</span>
@@ -378,14 +523,10 @@
       <div class="card__footer">acessar_módulo <i data-lucide="arrow-right" style="width:12px;height:12px;"></i></div>
     </a>
 
-    <!-- 3. TRACKER -->
-    <a class="card" href="https://cardano-sys-logs-storage-1102.github.io/tracker/" style="--card-accent: var(--accent-trk);" aria-label="Abrir Tracker">
-      <div class="card__icon-wrap"><i data-lucide="activity" style="width:18px;height:18px;"></i></div>
-      <span class="card__label">// hábitos</span>
-      <h2 class="card__title">Tracker</h2>
-      <p class="card__desc">Monitore hábitos, metas diárias e progresso ao longo do tempo.</p>
-      <div class="card__footer">acessar_módulo <i data-lucide="arrow-right" style="width:12px;height:12px;"></i></div>
-    </a>
+    <!-- ROW SEPARATOR -->
+    <div class="grid-row-sep"></div>
+
+    <!-- ── ROW 2 ── -->
 
     <!-- 4. DATA LAB -->
     <a class="card" href="https://cardano-sys-logs-storage-1102.github.io/data-analyse-statistics/" style="--card-accent: var(--accent-dat);" aria-label="Abrir Data Lab">
@@ -396,7 +537,49 @@
       <div class="card__footer">acessar_módulo <i data-lucide="arrow-right" style="width:12px;height:12px;"></i></div>
     </a>
 
-    <!-- 5. POMODORO — FLIP CARD -->
+    <!-- 5. CANVAS — FLIP CARD -->
+    <div class="canvas-flip-wrapper" id="canvasFlipWrapper">
+      <div class="canvas-flip-inner" id="canvasFlipInner">
+
+        <!-- FRONT -->
+        <div class="canvas-flip-face canvas-flip-front" onclick="doCanvasFlip()" role="button" aria-label="Abrir Canvas">
+          <div class="card__icon-wrap" style="color: var(--accent-cvs);"><i data-lucide="pen-tool" style="width:18px;height:18px;"></i></div>
+          <span class="card__label" style="color: var(--accent-cvs);">// canvas</span>
+          <h2 class="card__title">Canvas</h2>
+          <p class="card__desc">Quadros visuais para fluxogramas, mind maps e frameworks de análise.</p>
+          <div class="card__footer" style="color: var(--accent-cvs);">acessar_módulo <i data-lucide="arrow-right" style="width:12px;height:12px;"></i></div>
+        </div>
+
+        <!-- BACK -->
+        <div class="canvas-flip-face canvas-flip-back">
+          <div class="canvas-back-wrap">
+            <div class="ccorner tl"></div><div class="ccorner tr"></div>
+            <div class="ccorner bl"></div><div class="ccorner br"></div>
+
+            <div class="canvas-back-header">
+              <span class="canvas-back-tag">// canvas</span>
+              <div class="canvas-back-actions">
+                <button class="canvas-back-btn" onclick="doCanvasFlip()">← hub</button>
+                <a class="canvas-back-btn open-ext" href="https://cardano-sys-logs-storage-1102.github.io/canvas/" target="_blank" onclick="event.stopPropagation()">↗ expandir</a>
+              </div>
+            </div>
+
+            <div class="canvas-iframe-wrap">
+              <iframe
+                id="canvasIframe"
+                src=""
+                title="Hub Canvas"
+                loading="lazy"
+                allow="clipboard-read; clipboard-write"
+              ></iframe>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /canvas-flip-inner -->
+    </div><!-- /canvas-flip-wrapper -->
+
+    <!-- 6. POMODORO — FLIP CARD -->
     <div class="flip-wrapper" id="flipWrapper">
       <div class="flip-inner" id="flipInner">
 
@@ -493,16 +676,44 @@
 <script>
   lucide.createIcons();
 
-  /* ── SYNC FLIP HEIGHT ── */
-  function syncFlipHeight() {
-    const ref = document.querySelector('.card');
-    const inner = document.getElementById('flipInner');
-    if (ref && inner) inner.style.height = ref.offsetHeight + 'px';
-  }
-  window.addEventListener('load', syncFlipHeight);
-  window.addEventListener('resize', syncFlipHeight);
+  /* ── SYNC HEIGHTS (cards in same row should match) ── */
+  function syncHeights() {
+    // Sync flip wrappers to match sibling .card height in their row
+    const cards = document.querySelectorAll('.card');
+    if (!cards.length) return;
 
-  /* ── FLIP ── */
+    // Row 1: cards 0-2, Row 2: cards 3-5 (DataLab + 2 flip wrappers)
+    // Get max height per row
+    const row1 = [...document.querySelectorAll('.grid > .card:nth-child(-n+3)')];
+    const row1H = Math.max(...row1.map(c => c.offsetHeight));
+
+    // For row 2, measure DataLab card
+    const dataLabCard = document.querySelector('.grid > .card:last-of-type');
+    const row2H = dataLabCard ? dataLabCard.offsetHeight : row1H;
+
+    // Apply to flip wrappers
+    const canvasInner = document.getElementById('canvasFlipInner');
+    const pomoInner   = document.getElementById('flipInner');
+    if (canvasInner) canvasInner.style.height = row2H + 'px';
+    if (pomoInner)   pomoInner.style.height   = row2H + 'px';
+  }
+
+  window.addEventListener('load', syncHeights);
+  window.addEventListener('resize', syncHeights);
+
+  /* ── CANVAS FLIP ── */
+  let canvasLoaded = false;
+  function doCanvasFlip() {
+    const wrapper = document.getElementById('canvasFlipWrapper');
+    wrapper.classList.toggle('flipped');
+    // Lazy-load iframe on first flip
+    if (!canvasLoaded && wrapper.classList.contains('flipped')) {
+      canvasLoaded = true;
+      document.getElementById('canvasIframe').src = 'https://cardano-sys-logs-storage-1102.github.io/canvas/';
+    }
+  }
+
+  /* ── POMODORO FLIP ── */
   function doFlip() {
     document.getElementById('flipWrapper').classList.toggle('flipped');
   }
