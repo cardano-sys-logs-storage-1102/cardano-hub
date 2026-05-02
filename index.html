@@ -24,6 +24,7 @@
       --accent-trk:   #aaff00;
       --accent-dat:   #bf80ff;
       --accent-cvs:   #ff80bf;
+      --accent-agt:   #ffcc00;
       --radius-card:  14px;
       --transition:   0.3s cubic-bezier(.4,0,.2,1);
     }
@@ -81,7 +82,6 @@
       gap: 14px;
     }
 
-    /* Row separator — subtle horizontal divider */
     .grid-row-sep {
       grid-column: 1 / -1;
       height: 1px;
@@ -111,10 +111,8 @@
     .card:nth-child(1) { animation-delay: 0.10s; }
     .card:nth-child(2) { animation-delay: 0.18s; }
     .card:nth-child(3) { animation-delay: 0.26s; }
-    /* row sep counts as child 4 */
     .card:nth-child(5) { animation-delay: 0.34s; }
     .card:nth-child(6) { animation-delay: 0.42s; }
-    /* flip-wrapper is child 7 */
 
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(20px); }
@@ -213,7 +211,6 @@
       border-radius: var(--radius-card); overflow: hidden;
     }
 
-    /* FRONT */
     .canvas-flip-front {
       display: flex; flex-direction: column;
       background: var(--glass-bg);
@@ -244,14 +241,12 @@
 
     .canvas-flip-wrapper:not(.flipped) .canvas-flip-front:hover::after { opacity: 0.18; transform: scale(1.4); }
 
-    /* BACK */
     .canvas-flip-back {
       transform: rotateY(180deg);
       background: #0d0d14;
       border: 1px solid #2a1a2a;
     }
 
-    /* CANVAS IFRAME BACK */
     .canvas-back-wrap {
       width: 100%; height: 100%; position: relative;
       font-family: 'Share Tech Mono', monospace;
@@ -271,9 +266,7 @@
       text-transform: uppercase;
     }
 
-    .canvas-back-actions {
-      display: flex; gap: 6px; align-items: center;
-    }
+    .canvas-back-actions { display: flex; gap: 6px; align-items: center; }
 
     .canvas-back-btn {
       background: transparent; border: 1px solid rgba(255,128,191,0.25);
@@ -289,21 +282,15 @@
       border-color: rgba(255,128,191,0.4); color: rgba(255,128,191,0.8);
     }
 
-    .canvas-back-btn.open-ext:hover {
-      background: var(--accent-cvs); color: #000;
-    }
+    .canvas-back-btn.open-ext:hover { background: var(--accent-cvs); color: #000; }
 
     .canvas-iframe-wrap {
       flex: 1; position: relative; overflow: hidden;
       border-radius: 0 0 var(--radius-card) var(--radius-card);
     }
 
-    .canvas-iframe-wrap iframe {
-      width: 100%; height: 100%; border: none;
-      display: block;
-    }
+    .canvas-iframe-wrap iframe { width: 100%; height: 100%; border: none; display: block; }
 
-    /* corner decorations reused */
     .ccorner { position: absolute; width: 10px; height: 10px; border-color: var(--accent-cvs); border-style: solid; opacity: 0.3; z-index: 2; pointer-events: none; }
     .ccorner.tl { top:7px; left:7px;     border-width: 1px 0 0 1px; }
     .ccorner.tr { top:7px; right:7px;    border-width: 1px 1px 0 0; }
@@ -311,32 +298,33 @@
     .ccorner.br { bottom:7px; right:7px; border-width: 0 1px 1px 0; }
 
     /* ══════════════════════════════════════
-       POMODORO FLIP CARD
+       AGENTS FLIP CARD
     ══════════════════════════════════════ */
 
-    .flip-wrapper {
+    .agent-flip-wrapper {
       perspective: 1200px;
       opacity: 0;
       animation: fadeUp 0.6s cubic-bezier(.4,0,.2,1) 0.50s forwards;
     }
 
-    .flip-inner {
+    .agent-flip-inner {
       position: relative; width: 100%;
       transform-style: preserve-3d;
       transition: transform 0.7s cubic-bezier(.4,0,.2,1);
       border-radius: var(--radius-card);
     }
 
-    .flip-wrapper.flipped .flip-inner { transform: rotateY(180deg); }
+    .agent-flip-wrapper.flipped .agent-flip-inner { transform: rotateY(180deg); }
 
-    .flip-face {
+    .agent-flip-face {
       position: absolute; inset: 0;
       backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
       border-radius: var(--radius-card); overflow: hidden;
     }
 
-    .flip-front {
+    /* FRONT */
+    .agent-flip-front {
       display: flex; flex-direction: column;
       background: var(--glass-bg);
       backdrop-filter: blur(18px) saturate(1.2);
@@ -346,130 +334,217 @@
       transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
     }
 
-    .flip-front::before {
+    .agent-flip-front::before {
       content: ''; position: absolute; inset: 0;
-      background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,255,65,0.012) 3px, rgba(0,255,65,0.012) 6px);
+      background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(255,204,0,0.008) 3px, rgba(255,204,0,0.008) 6px);
       pointer-events: none;
     }
 
-    .flip-front::after {
+    .agent-flip-front::after {
       content: ''; position: absolute; top: -20px; right: -20px;
       width: 100px; height: 100px; border-radius: 50%;
-      background: var(--accent-pom); opacity: 0.06; filter: blur(25px);
+      background: var(--accent-agt); opacity: 0.07; filter: blur(25px);
       transition: opacity var(--transition), transform var(--transition);
     }
 
-    .flip-wrapper:not(.flipped) .flip-front:hover {
-      background: rgba(0,18,6,0.7); border-color: var(--accent-pom);
-      box-shadow: 0 0 20px rgba(0,255,65,0.08), 0 20px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(0,255,65,0.1);
+    .agent-flip-wrapper:not(.flipped) .agent-flip-front:hover {
+      background: rgba(10, 9, 0, 0.75);
+      border-color: var(--accent-agt);
+      box-shadow: 0 0 20px rgba(255,204,0,0.08), 0 20px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,204,0,0.1);
     }
 
-    .flip-wrapper:not(.flipped) .flip-front:hover::after { opacity: 0.18; transform: scale(1.4); }
+    .agent-flip-wrapper:not(.flipped) .agent-flip-front:hover::after { opacity: 0.2; transform: scale(1.4); }
 
-    .flip-back {
+    /* BACK */
+    .agent-flip-back {
       transform: rotateY(180deg);
-      background: #0d0d0d;
-      border: 1px solid #1a2a1a;
+      background: #0d0c00;
+      border: 1px solid rgba(255,204,0,0.15);
     }
 
-    /* POMODORO INTERNALS */
-    .pomo-wrap {
+    .agent-back-wrap {
       width: 100%; height: 100%; position: relative;
       font-family: 'Share Tech Mono', monospace;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      padding: 14px 12px 12px;
+      display: flex; flex-direction: column;
+      padding: 14px 14px 12px;
     }
 
-    .pomo-wrap::before {
+    /* scanline effect amber */
+    .agent-back-wrap::before {
       content: ''; position: absolute; inset: 0;
-      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,65,0.015) 2px, rgba(0,255,65,0.015) 4px);
-      pointer-events: none; z-index: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(255,204,0,0.018) 3px, rgba(255,204,0,0.018) 6px);
+      pointer-events: none; border-radius: var(--radius-card);
     }
 
-    .pcorner { position: absolute; width: 10px; height: 10px; border-color: #00ff41; border-style: solid; opacity: 0.4; z-index: 2; }
-    .pcorner.tl { top:7px; left:7px;     border-width: 1px 0 0 1px; }
-    .pcorner.tr { top:7px; right:7px;    border-width: 1px 1px 0 0; }
-    .pcorner.bl { bottom:7px; left:7px;  border-width: 0 0 1px 1px; }
-    .pcorner.br { bottom:7px; right:7px; border-width: 0 1px 1px 0; }
+    /* amber corner decorations */
+    .acorner { position: absolute; width: 10px; height: 10px; border-color: var(--accent-agt); border-style: solid; opacity: 0.35; z-index: 2; pointer-events: none; }
+    .acorner.tl { top:7px; left:7px;     border-width: 1px 0 0 1px; }
+    .acorner.tr { top:7px; right:7px;    border-width: 1px 1px 0 0; }
+    .acorner.bl { bottom:7px; left:7px;  border-width: 0 0 1px 1px; }
+    .acorner.br { bottom:7px; right:7px; border-width: 0 1px 1px 0; }
 
-    .back-btn {
-      position: absolute; top: 9px; left: 10px;
-      background: transparent; border: none; cursor: pointer;
-      font-family: 'Share Tech Mono', monospace; font-size: 8px;
-      color: #1a4a1a; letter-spacing: 2px; padding: 2px 4px;
-      transition: color 0.2s; z-index: 10; text-transform: uppercase;
+    .agent-back-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px; flex-shrink: 0; z-index: 5; position: relative;
     }
-    .back-btn:hover { color: #00ff41; }
 
-    .p-ring-wrap { position: relative; width: 110px; height: 110px; flex-shrink: 0; z-index: 1; }
-    .p-ring-svg  { width: 110px; height: 110px; transform: rotate(-90deg); }
-    .p-ring-track { fill: none; stroke: #0d1f0d; stroke-width: 5; }
-    .p-ring-prog  { fill: none; stroke: #00ff41; stroke-width: 5; stroke-linecap: round; transition: stroke-dashoffset 1s linear, stroke 0.5s; filter: drop-shadow(0 0 4px #00ff41aa); }
-
-    .p-ring-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-
-    .p-time { font-size: 22px; color: #00ff41; letter-spacing: 2px; line-height: 1; text-shadow: 0 0 8px #00ff4166; }
-    .p-mode { font-size: 7px; color: #2a5a2a; letter-spacing: 3px; margin-top: 3px; text-transform: uppercase; }
-
-    .p-idle { display: flex; flex-direction: column; align-items: center; gap: 7px; z-index: 1; }
-    .p-idle-tag   { font-size: 8px; letter-spacing: 3px; color: #1a4a1a; text-transform: uppercase; }
-    .p-idle-title { font-family: 'Rajdhani', sans-serif; font-size: 20px; font-weight: 300; color: #00ff41; letter-spacing: 5px; text-transform: uppercase; }
-    .p-idle-desc  { font-size: 9px; color: #2a4a2a; text-align: center; line-height: 1.6; max-width: 120px; }
-
-    .p-start-btn {
-      margin-top: 5px; background: transparent; border: 1px solid #00ff41;
-      color: #00ff41; font-family: 'Share Tech Mono', monospace;
-      font-size: 9px; letter-spacing: 3px; padding: 5px 16px;
-      cursor: pointer; transition: background 0.2s, color 0.2s; text-transform: uppercase;
+    .agent-back-tag {
+      font-size: 8px; letter-spacing: 3px; color: rgba(255,204,0,0.45);
+      text-transform: uppercase;
     }
-    .p-start-btn:hover { background: #00ff41; color: #000; }
 
-    .p-active { display: none; flex-direction: column; align-items: center; width: 100%; height: 100%; position: relative; z-index: 1; }
+    .agent-back-hub-btn {
+      background: transparent; border: 1px solid rgba(255,204,0,0.2);
+      color: rgba(255,204,0,0.5); font-family: 'Share Tech Mono', monospace;
+      font-size: 8px; letter-spacing: 2px; padding: 3px 8px;
+      cursor: pointer; transition: all 0.2s; text-transform: uppercase;
+      border-radius: 4px;
+    }
+    .agent-back-hub-btn:hover { border-color: var(--accent-agt); color: var(--accent-agt); }
 
-    .p-controls { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 5px; }
-    .p-ctrl { background: transparent; border: none; cursor: pointer; padding: 3px; display: flex; align-items: center; transition: opacity 0.2s; }
-    .p-ctrl:hover { opacity: 0.6; }
+    /* agent pills */
+    .agent-pills {
+      display: flex; flex-direction: column; gap: 10px;
+      flex: 1; justify-content: center; position: relative; z-index: 5;
+    }
 
-    .p-sessions { width: 100%; margin-top: 7px; }
-    .p-sessions-label { font-size: 7px; color: #1a3a1a; letter-spacing: 2px; margin-bottom: 4px; display: flex; justify-content: space-between; }
-    .p-dots { display: flex; gap: 4px; flex-wrap: wrap; }
+    .agent-pill {
+      display: flex; align-items: center; gap: 12px;
+      padding: 11px 14px;
+      border: 1px solid rgba(255,204,0,0.18);
+      border-radius: 8px;
+      background: rgba(255,204,0,0.04);
+      text-decoration: none; color: inherit;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(.4,0,.2,1);
+      position: relative; overflow: hidden;
+    }
 
-    .pdot { width: 7px; height: 7px; border: 1px solid #1a3a1a; border-radius: 50%; transition: background 0.3s, border-color 0.3s, box-shadow 0.3s; }
-    .pdot.done { background: #00ff41; border-color: #00ff41; box-shadow: 0 0 4px #00ff4188; }
-    .pdot.active-dot { border-color: #00ff41; animation: pdot-pulse 1s ease-in-out infinite; }
-    @keyframes pdot-pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    .agent-pill::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,204,0,0.06), transparent);
+      transform: translateX(-100%);
+      transition: transform 0.4s ease;
+    }
 
-    .p-gear { position: absolute; bottom: 7px; left: 9px; background: transparent; border: none; cursor: pointer; opacity: 0.35; transition: opacity 0.2s; z-index: 10; padding: 2px; }
-    .p-gear:hover { opacity: 1; }
+    .agent-pill:hover::before { transform: translateX(100%); }
 
-    .p-settings { position: absolute; inset: 0; background: #0a0d0a; border-radius: var(--radius-card); display: none; flex-direction: column; padding: 14px 12px; z-index: 20; gap: 9px; }
-    .p-settings-title { font-size: 8px; letter-spacing: 3px; color: #00ff41; text-transform: uppercase; opacity: 0.7; }
-    .p-setting-row { display: flex; flex-direction: column; gap: 3px; }
-    .p-setting-label { font-size: 7px; color: #2a5a2a; letter-spacing: 2px; text-transform: uppercase; }
-    .p-setting-input { background: #0d150d; border: 1px solid #1a3a1a; color: #00ff41; font-family: 'Share Tech Mono', monospace; font-size: 12px; padding: 3px 6px; width: 100%; outline: none; transition: border-color 0.2s; }
-    .p-setting-input:focus { border-color: #00ff41; }
-    .p-meta-display { font-size: 9px; color: #2a5a2a; letter-spacing: 1px; padding: 3px 6px; border: 1px solid #1a3a1a; background: #0d150d; }
-    .p-s-actions { display: flex; gap: 6px; margin-top: auto; }
-    .p-s-btn { flex: 1; background: transparent; border: 1px solid #1a3a1a; color: #2a5a2a; font-family: 'Share Tech Mono', monospace; font-size: 8px; letter-spacing: 2px; padding: 5px 4px; cursor: pointer; text-transform: uppercase; transition: all 0.2s; }
-    .p-s-btn:hover { border-color: #00ff41; color: #00ff41; }
-    .p-s-btn.danger:hover { border-color: #ff4141; color: #ff4141; }
-    .p-s-btn.save { border-color: #00ff41; color: #00ff41; }
-    .p-s-btn.save:hover { background: #00ff41; color: #000; }
+    .agent-pill:hover {
+      border-color: var(--accent-agt);
+      background: rgba(255,204,0,0.09);
+      transform: translateX(4px);
+      box-shadow: 0 0 16px rgba(255,204,0,0.1), inset 0 1px 0 rgba(255,204,0,0.12);
+    }
 
-    .p-break { position: absolute; inset: 0; background: #0a0d0a; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 7px; z-index: 15; border-radius: var(--radius-card); }
-    .p-break-text { font-size: 8px; letter-spacing: 4px; color: #00cc33; text-transform: uppercase; animation: flicker 3s infinite; }
-    .p-break-time { font-size: 26px; color: #00ff41; text-shadow: 0 0 10px #00ff41aa; }
-    .p-skip { background: transparent; border: 1px solid #1a3a1a; color: #2a5a2a; font-family: 'Share Tech Mono', monospace; font-size: 8px; letter-spacing: 2px; padding: 4px 10px; cursor: pointer; transition: all 0.2s; text-transform: uppercase; }
-    .p-skip:hover { border-color: #00ff41; color: #00ff41; }
+    .agent-pill-icon {
+      width: 32px; height: 32px; border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(255,204,0,0.08);
+      border: 1px solid rgba(255,204,0,0.2);
+      color: var(--accent-agt); flex-shrink: 0;
+      transition: all 0.25s;
+    }
 
-    @keyframes flicker { 0%,96%,100%{opacity:.7} 97%{opacity:.2} 98%{opacity:.9} 99%{opacity:.3} }
+    .agent-pill:hover .agent-pill-icon {
+      background: rgba(255,204,0,0.15);
+      border-color: var(--accent-agt);
+      box-shadow: 0 0 10px rgba(255,204,0,0.2);
+    }
 
-    .p-rain { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; opacity: 0.3; }
-    .p-rain-col { position: absolute; top: -100%; font-size: 8px; color: #00ff41; display: flex; flex-direction: column; animation: p-fall linear infinite; opacity: 0; font-family: 'Share Tech Mono', monospace; }
-    @keyframes p-fall { 0%{transform:translateY(0);opacity:0} 5%{opacity:1} 90%{opacity:0.5} 100%{transform:translateY(500px);opacity:0} }
+    .agent-pill-text { flex: 1; }
 
-    .p-fade-in { animation: p-fadein 0.35s ease forwards; }
-    @keyframes p-fadein { from{opacity:0;transform:scale(0.97)} to{opacity:1;transform:scale(1)} }
+    .agent-pill-name {
+      font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700;
+      color: var(--text-primary); display: block; line-height: 1.2;
+    }
+
+    .agent-pill-sub {
+      font-size: 9px; color: rgba(255,204,0,0.5); letter-spacing: 0.12em;
+      text-transform: uppercase; margin-top: 2px; display: block;
+    }
+
+    .agent-pill-arrow {
+      color: rgba(255,204,0,0.3); transition: all 0.25s;
+      font-family: 'Share Tech Mono', monospace; font-size: 12px;
+    }
+
+    .agent-pill:hover .agent-pill-arrow {
+      color: var(--accent-agt); transform: translateX(3px);
+    }
+
+    /* pulse dot on pills */
+    .agent-pulse {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--accent-agt);
+      box-shadow: 0 0 6px var(--accent-agt);
+      animation: agt-pulse 2s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes agt-pulse {
+      0%,100% { opacity: 1; box-shadow: 0 0 6px var(--accent-agt); }
+      50%      { opacity: 0.3; box-shadow: 0 0 2px var(--accent-agt); }
+    }
+
+    /* ══════════════════════════════════════
+       CLOCK WIDGET (bottom-right)
+    ══════════════════════════════════════ */
+
+    .clock-widget {
+      position: fixed;
+      bottom: 28px; right: 28px;
+      z-index: 100;
+      cursor: pointer;
+      display: flex; flex-direction: column; align-items: center;
+      gap: 3px;
+      font-family: 'Share Tech Mono', monospace;
+      padding: 10px 14px;
+      background: rgba(0, 8, 2, 0.72);
+      border: 1px solid rgba(255, 204, 0, 0.2);
+      border-radius: 10px;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      transition: all 0.25s cubic-bezier(.4,0,.2,1);
+      box-shadow: 0 0 18px rgba(255,204,0,0.04);
+      user-select: none;
+    }
+
+    .clock-widget::before {
+      content: ''; position: absolute; inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,204,0,0.012) 2px, rgba(255,204,0,0.012) 4px);
+      pointer-events: none; border-radius: 10px;
+    }
+
+    .clock-widget:hover {
+      border-color: rgba(255, 204, 0, 0.55);
+      background: rgba(10, 8, 0, 0.85);
+      box-shadow: 0 0 24px rgba(255,204,0,0.12), 0 8px 24px rgba(0,0,0,0.5);
+      transform: translateY(-2px);
+    }
+
+    .clock-tag {
+      font-size: 7px; letter-spacing: 3px; color: rgba(255,204,0,0.35);
+      text-transform: uppercase;
+    }
+
+    .clock-time {
+      font-size: 20px; letter-spacing: 3px;
+      color: #ffcc00;
+      text-shadow: 0 0 10px rgba(255,204,0,0.5);
+      line-height: 1;
+    }
+
+    .clock-label {
+      font-size: 7px; letter-spacing: 2px; color: rgba(255,204,0,0.28);
+      text-transform: uppercase;
+    }
+
+    /* corner accents on clock */
+    .clock-corner { position: absolute; width: 7px; height: 7px; border-color: rgba(255,204,0,0.4); border-style: solid; }
+    .clock-corner.tl { top:5px; left:5px;     border-width: 1px 0 0 1px; }
+    .clock-corner.tr { top:5px; right:5px;    border-width: 1px 1px 0 0; }
+    .clock-corner.bl { bottom:5px; left:5px;  border-width: 0 0 1px 1px; }
+    .clock-corner.br { bottom:5px; right:5px; border-width: 0 1px 1px 0; }
 
     /* ── FOOTER ── */
     .footer {
@@ -482,7 +557,12 @@
     .footer__dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); animation: pulse 2s ease-in-out infinite; }
     @keyframes pulse { 0%,100%{opacity:1;box-shadow:0 0 6px var(--green)} 50%{opacity:0.4;box-shadow:0 0 2px var(--green)} }
 
-    @media (max-width: 600px) { .page { padding: 0 14px 60px; } .blur-zone { width: 100%; border-radius: 0; } }
+    @media (max-width: 600px) {
+      .page { padding: 0 14px 60px; }
+      .blur-zone { width: 100%; border-radius: 0; }
+      .clock-widget { bottom: 16px; right: 16px; padding: 8px 11px; }
+      .clock-time { font-size: 16px; }
+    }
   </style>
 </head>
 <body>
@@ -491,14 +571,24 @@
 <div class="vignette"></div>
 <div class="blur-zone"></div>
 
+<!-- ── CLOCK WIDGET ── -->
+<div class="clock-widget" onclick="window.open('https://cardano-sys-logs-storage-1102.github.io/pomodoro/', '_blank')" title="Abrir Pomodoro">
+  <div class="clock-corner tl"></div>
+  <div class="clock-corner tr"></div>
+  <div class="clock-corner bl"></div>
+  <div class="clock-corner br"></div>
+  <span class="clock-tag">// timer</span>
+  <span class="clock-time" id="clockDisplay">00:00:00</span>
+  <span class="clock-label">pomodoro ↗</span>
+</div>
+
 <div class="page">
   <div class="grid">
 
     <!-- ── ROW 1 ── -->
 
     <!-- 1. FINANCEIRO -->
-    <!-- <a class="card" href="https://cardano-sys-logs-storage-1102.github.io/Dashboard-Financeiro/" style="--card-accent: var(--accent-fin);" aria-label="Abrir Financeiro">-->
-    <a class="card" href="https://cardano-sys-logs-storage-1102.github.io/Dashboard-Financeiro/" style="--card-accent: var(--accent-fin);" aria-label="Abrir Financeiro"> 
+    <a class="card" href="https://cardano-sys-logs-storage-1102.github.io/Dashboard-Financeiro/" style="--card-accent: var(--accent-fin);" aria-label="Abrir Financeiro">
       <div class="card__icon-wrap"><i data-lucide="line-chart" style="width:18px;height:18px;"></i></div>
       <span class="card__label">// gestão</span>
       <h2 class="card__title">Financeiro</h2>
@@ -577,94 +667,75 @@
           </div>
         </div>
 
-      </div><!-- /canvas-flip-inner -->
-    </div><!-- /canvas-flip-wrapper -->
+      </div>
+    </div>
 
-    <!-- 6. POMODORO — FLIP CARD -->
-    <div class="flip-wrapper" id="flipWrapper">
-      <div class="flip-inner" id="flipInner">
+    <!-- 6. AGENTES — FLIP CARD -->
+    <div class="agent-flip-wrapper" id="agentFlipWrapper">
+      <div class="agent-flip-inner" id="agentFlipInner">
 
         <!-- FRONT -->
-        <div class="flip-face flip-front" onclick="doFlip()" role="button" aria-label="Abrir Pomodoro">
-          <div class="card__icon-wrap" style="color: var(--accent-pom);"><i data-lucide="timer" style="width:18px;height:18px;"></i></div>
-          <span class="card__label" style="color: var(--accent-pom);">// foco</span>
-          <h2 class="card__title">Pomodoro</h2>
-          <p class="card__desc">Ciclos de trabalho e pausa para maximizar produtividade e concentração.</p>
-          <div class="card__footer" style="color: var(--accent-pom);">acessar_módulo <i data-lucide="arrow-right" style="width:12px;height:12px;"></i></div>
+        <div class="agent-flip-face agent-flip-front" onclick="doAgentFlip()" role="button" aria-label="Abrir Agentes">
+          <div class="card__icon-wrap" style="color: var(--accent-agt); border-color: rgba(255,204,0,0.2);">
+            <i data-lucide="bot" style="width:18px;height:18px;"></i>
+          </div>
+          <span class="card__label" style="color: var(--accent-agt);">// ia</span>
+          <h2 class="card__title">Agentes</h2>
+          <p class="card__desc">Agentes inteligentes para busca de vagas e resumo de notícias em tempo real.</p>
+          <div class="card__footer" style="color: var(--accent-agt);">acessar_módulo <i data-lucide="arrow-right" style="width:12px;height:12px;"></i></div>
         </div>
 
         <!-- BACK -->
-        <div class="flip-face flip-back">
-          <div class="pomo-wrap" id="pomoWrap">
-            <div class="pcorner tl"></div><div class="pcorner tr"></div>
-            <div class="pcorner bl"></div><div class="pcorner br"></div>
-            <div class="p-rain" id="pRain"></div>
-            <button class="back-btn" onclick="doFlip()">← hub</button>
+        <div class="agent-flip-face agent-flip-back">
+          <div class="agent-back-wrap">
+            <div class="acorner tl"></div><div class="acorner tr"></div>
+            <div class="acorner bl"></div><div class="acorner br"></div>
 
-            <!-- IDLE -->
-            <div class="p-idle" id="pIdle">
-              <span class="p-idle-tag">// foco</span>
-              <span class="p-idle-title">Pomodoro</span>
-              <p class="p-idle-desc">ciclos de trabalho e pausa para maximizar produtividade</p>
-              <button class="p-start-btn" onclick="pomoStart()">iniciar</button>
+            <div class="agent-back-header">
+              <span class="agent-back-tag">// agentes_ia</span>
+              <button class="agent-back-hub-btn" onclick="doAgentFlip()">← hub</button>
             </div>
 
-            <!-- ACTIVE -->
-            <div class="p-active" id="pActive">
-              <div class="p-ring-wrap">
-                <svg class="p-ring-svg" viewBox="0 0 110 110">
-                  <circle class="p-ring-track" cx="55" cy="55" r="46"/>
-                  <circle class="p-ring-prog" id="pRingProg" cx="55" cy="55" r="46"/>
-                </svg>
-                <div class="p-ring-center">
-                  <span class="p-time" id="pTimeDisplay">25:00</span>
-                  <span class="p-mode" id="pModeLabel">focus</span>
+            <div class="agent-pills">
+
+              <!-- NEWS HUB -->
+              <a class="agent-pill"
+                 href="https://cardano-sys-logs-storage-1102.github.io/news-hub/"
+                 target="_blank"
+                 onclick="event.stopPropagation()">
+                <div class="agent-pill-icon">
+                  <i data-lucide="newspaper" style="width:15px;height:15px;"></i>
                 </div>
-              </div>
-              <div class="p-controls">
-                <button class="p-ctrl" onclick="pomoToggle()">
-                  <svg id="pPlayIcon" viewBox="0 0 24 24" width="15" height="15"><polygon points="5,3 19,12 5,21" fill="#00ff41"/></svg>
-                  <svg id="pPauseIcon" viewBox="0 0 24 24" width="15" height="15" style="display:none"><rect x="6" y="4" width="4" height="16" fill="#00ff41"/><rect x="14" y="4" width="4" height="16" fill="#00ff41"/></svg>
-                </button>
-              </div>
-              <div class="p-sessions">
-                <div class="p-sessions-label"><span>sessões</span><span id="pSessionsCount">0 / 4</span></div>
-                <div class="p-dots" id="pDots"></div>
-              </div>
-            </div>
+                <div class="agent-pill-text">
+                  <span class="agent-pill-name">News Hub</span>
+                  <span class="agent-pill-sub">// resumo de notícias</span>
+                </div>
+                <div class="agent-pulse"></div>
+                <span class="agent-pill-arrow">↗</span>
+              </a>
 
-            <!-- BREAK -->
-            <div class="p-break" id="pBreak">
-              <span class="p-break-text">pausa</span>
-              <span class="p-break-time" id="pBreakDisplay">05:00</span>
-              <button class="p-skip" onclick="pomoSkipBreak()">pular →</button>
-            </div>
+              <!-- VAGAS HUB -->
+              <a class="agent-pill"
+                 href="https://cardano-sys-logs-storage-1102.github.io/vagas-hub/"
+                 target="_blank"
+                 onclick="event.stopPropagation()">
+                <div class="agent-pill-icon">
+                  <i data-lucide="briefcase" style="width:15px;height:15px;"></i>
+                </div>
+                <div class="agent-pill-text">
+                  <span class="agent-pill-name">Vagas Hub</span>
+                  <span class="agent-pill-sub">// busca de empregos</span>
+                </div>
+                <div class="agent-pulse"></div>
+                <span class="agent-pill-arrow">↗</span>
+              </a>
 
-            <!-- SETTINGS -->
-            <div class="p-settings" id="pSettings">
-              <span class="p-settings-title">config</span>
-              <div class="p-setting-row"><span class="p-setting-label">trabalho (min)</span><input class="p-setting-input" type="number" id="pWorkInput" min="1" max="90" value="25"></div>
-              <div class="p-setting-row"><span class="p-setting-label">pausa (min)</span><input class="p-setting-input" type="number" id="pBreakInput" min="1" max="30" value="5"></div>
-              <div class="p-setting-row"><span class="p-setting-label">meta (sessões)</span><input class="p-setting-input" type="number" id="pGoalInput" min="1" max="12" value="4"></div>
-              <div class="p-setting-row"><span class="p-setting-label">progresso</span><div class="p-meta-display" id="pProgressDisplay">0 sessões concluídas</div></div>
-              <div class="p-s-actions">
-                <button class="p-s-btn danger" onclick="pomoReset()">reset</button>
-                <button class="p-s-btn save" onclick="pomoSave()">salvar</button>
-              </div>
             </div>
-
-            <!-- GEAR -->
-            <button class="p-gear" id="pGear" onclick="pomoToggleSettings()" style="display:none">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#00ff41" stroke-width="1.5" width="13" height="13">
-                <circle cx="12" cy="12" r="3"/>
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-              </svg>
-            </button>
           </div>
         </div>
 
-      </div><!-- /flip-inner -->
-    </div><!-- /flip-wrapper -->
+      </div>
+    </div>
 
   </div><!-- /grid -->
 
@@ -677,26 +748,18 @@
 <script>
   lucide.createIcons();
 
-  /* ── SYNC HEIGHTS (cards in same row should match) ── */
+  /* ── SYNC HEIGHTS ── */
   function syncHeights() {
-    // Sync flip wrappers to match sibling .card height in their row
-    const cards = document.querySelectorAll('.card');
-    if (!cards.length) return;
+    const row1Cards = [...document.querySelectorAll('.grid > .card')].slice(0,3);
+    const row2Cards = [...document.querySelectorAll('.grid > .card')].slice(3);
 
-    // Row 1: cards 0-2, Row 2: cards 3-5 (DataLab + 2 flip wrappers)
-    // Get max height per row
-    const row1 = [...document.querySelectorAll('.grid > .card:nth-child(-n+3)')];
-    const row1H = Math.max(...row1.map(c => c.offsetHeight));
+    const row1H = Math.max(...row1Cards.map(c => c.offsetHeight));
+    const row2H = row2Cards.length ? Math.max(...row2Cards.map(c => c.offsetHeight)) : row1H;
 
-    // For row 2, measure DataLab card
-    const dataLabCard = document.querySelector('.grid > .card:last-of-type');
-    const row2H = dataLabCard ? dataLabCard.offsetHeight : row1H;
-
-    // Apply to flip wrappers
     const canvasInner = document.getElementById('canvasFlipInner');
-    const pomoInner   = document.getElementById('flipInner');
+    const agentInner  = document.getElementById('agentFlipInner');
     if (canvasInner) canvasInner.style.height = row2H + 'px';
-    if (pomoInner)   pomoInner.style.height   = row2H + 'px';
+    if (agentInner)  agentInner.style.height  = row2H + 'px';
   }
 
   window.addEventListener('load', syncHeights);
@@ -707,161 +770,27 @@
   function doCanvasFlip() {
     const wrapper = document.getElementById('canvasFlipWrapper');
     wrapper.classList.toggle('flipped');
-    // Lazy-load iframe on first flip
     if (!canvasLoaded && wrapper.classList.contains('flipped')) {
       canvasLoaded = true;
       document.getElementById('canvasIframe').src = 'https://cardano-sys-logs-storage-1102.github.io/canvas/';
     }
   }
 
-  /* ── POMODORO FLIP ── */
-  function doFlip() {
-    document.getElementById('flipWrapper').classList.toggle('flipped');
+  /* ── AGENTS FLIP ── */
+  function doAgentFlip() {
+    document.getElementById('agentFlipWrapper').classList.toggle('flipped');
   }
 
-  /* ══════════════════════════════════════
-     POMODORO
-  ══════════════════════════════════════ */
-  let pWorkMin = 25, pBreakMin = 5, pGoal = 4;
-  let pDone = 0, pTotal = 0, pRemain = 0;
-  let pRunning = false, pInterval = null, pIsBreak = false, pSettingsOpen = false;
-  const P_CIRC = 2 * Math.PI * 46;
-
-  const pRainEl = document.getElementById('pRain');
-  const pChars = '01アイウエオカキクケコサシスセソタチツテト';
-  for (let i = 0; i < 8; i++) {
-    const col = document.createElement('div');
-    col.className = 'p-rain-col';
-    col.style.left = (i * 12 + Math.random() * 4) + '%';
-    col.style.animationDuration = (3 + Math.random() * 4) + 's';
-    col.style.animationDelay = (Math.random() * 5) + 's';
-    let t = '';
-    for (let j = 0; j < 18; j++) t += pChars[Math.floor(Math.random() * pChars.length)] + '<br>';
-    col.innerHTML = t;
-    pRainEl.appendChild(col);
+  /* ── CLOCK ── */
+  function updateClock() {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2,'0');
+    const m = String(now.getMinutes()).padStart(2,'0');
+    const s = String(now.getSeconds()).padStart(2,'0');
+    document.getElementById('clockDisplay').textContent = h + ':' + m + ':' + s;
   }
-
-  function pFmt(s) { return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0'); }
-
-  function pUpdateRing(frac) {
-    const r = document.getElementById('pRingProg');
-    r.style.strokeDasharray = P_CIRC;
-    r.style.strokeDashoffset = P_CIRC * (1 - frac);
-    if (frac < 0.25) { r.style.stroke = '#ffaa00'; r.style.filter = 'drop-shadow(0 0 4px #ffaa00aa)'; }
-    else             { r.style.stroke = '#00ff41'; r.style.filter = 'drop-shadow(0 0 4px #00ff41aa)'; }
-  }
-
-  function pRenderDots() {
-    const c = document.getElementById('pDots');
-    c.innerHTML = '';
-    document.getElementById('pSessionsCount').textContent = pDone + ' / ' + pGoal;
-    for (let i = 0; i < pGoal; i++) {
-      const d = document.createElement('div');
-      d.className = 'pdot';
-      if (i < pDone) d.classList.add('done');
-      else if (i === pDone && pRunning && !pIsBreak) d.classList.add('active-dot');
-      c.appendChild(d);
-    }
-  }
-
-  function pTick() {
-    if (pRemain <= 0) {
-      clearInterval(pInterval); pRunning = false;
-      if (!pIsBreak) { pDone = Math.min(pDone + 1, pGoal); pRenderDots(); pStartBreak(); }
-      else { pEndBreak(); }
-      return;
-    }
-    pRemain--;
-    if (!pIsBreak) { document.getElementById('pTimeDisplay').textContent = pFmt(pRemain); pUpdateRing(pRemain / pTotal); }
-    else           { document.getElementById('pBreakDisplay').textContent = pFmt(pRemain); }
-  }
-
-  function pomoStart() {
-    document.getElementById('pIdle').style.display = 'none';
-    document.getElementById('pRain').style.display = 'none';
-    const pa = document.getElementById('pActive');
-    pa.style.display = 'flex'; pa.classList.add('p-fade-in');
-    document.getElementById('pGear').style.display = 'block';
-    pTotal = pWorkMin * 60; pRemain = pTotal; pIsBreak = false;
-    document.getElementById('pTimeDisplay').textContent = pFmt(pRemain);
-    document.getElementById('pModeLabel').textContent = 'focus';
-    pUpdateRing(1); pRenderDots();
-  }
-
-  function pomoToggle() {
-    if (pRunning) {
-      clearInterval(pInterval); pRunning = false;
-      document.getElementById('pPlayIcon').style.display = 'block';
-      document.getElementById('pPauseIcon').style.display = 'none';
-      pRenderDots();
-    } else {
-      pRunning = true; pInterval = setInterval(pTick, 1000);
-      document.getElementById('pPlayIcon').style.display = 'none';
-      document.getElementById('pPauseIcon').style.display = 'block';
-      pRenderDots();
-    }
-  }
-
-  function pStartBreak() {
-    pIsBreak = true; pRemain = pBreakMin * 60;
-    const b = document.getElementById('pBreak');
-    b.style.display = 'flex'; b.classList.add('p-fade-in');
-    document.getElementById('pBreakDisplay').textContent = pFmt(pRemain);
-    document.getElementById('pPlayIcon').style.display = 'block';
-    document.getElementById('pPauseIcon').style.display = 'none';
-    pInterval = setInterval(pTick, 1000); pRunning = true;
-  }
-
-  function pomoSkipBreak() { clearInterval(pInterval); pRunning = false; pEndBreak(); }
-
-  function pEndBreak() {
-    pIsBreak = false;
-    document.getElementById('pBreak').style.display = 'none';
-    pTotal = pWorkMin * 60; pRemain = pTotal;
-    document.getElementById('pTimeDisplay').textContent = pFmt(pRemain);
-    document.getElementById('pModeLabel').textContent = pDone >= pGoal ? 'meta atingida' : 'focus';
-    pUpdateRing(1);
-    document.getElementById('pPlayIcon').style.display = 'block';
-    document.getElementById('pPauseIcon').style.display = 'none';
-    pRenderDots();
-  }
-
-  function pomoToggleSettings() {
-    pSettingsOpen = !pSettingsOpen;
-    const p = document.getElementById('pSettings');
-    if (pSettingsOpen) {
-      document.getElementById('pWorkInput').value = pWorkMin;
-      document.getElementById('pBreakInput').value = pBreakMin;
-      document.getElementById('pGoalInput').value = pGoal;
-      document.getElementById('pProgressDisplay').textContent = pDone + ' sessões concluídas';
-      p.style.display = 'flex'; p.classList.add('p-fade-in');
-    } else { p.style.display = 'none'; }
-  }
-
-  function pomoSave() {
-    pWorkMin  = Math.max(1, parseInt(document.getElementById('pWorkInput').value)  || 25);
-    pBreakMin = Math.max(1, parseInt(document.getElementById('pBreakInput').value) || 5);
-    pGoal     = Math.max(1, parseInt(document.getElementById('pGoalInput').value)  || 4);
-    if (!pRunning) { pTotal = pWorkMin * 60; pRemain = pTotal; document.getElementById('pTimeDisplay').textContent = pFmt(pRemain); pUpdateRing(1); }
-    pRenderDots(); pomoToggleSettings();
-  }
-
-  function pomoReset() {
-    clearInterval(pInterval);
-    pRunning = false; pIsBreak = false; pDone = 0;
-    pTotal = pWorkMin * 60; pRemain = pTotal;
-    document.getElementById('pBreak').style.display = 'none';
-    document.getElementById('pSettings').style.display = 'none';
-    pSettingsOpen = false;
-    document.getElementById('pTimeDisplay').textContent = pFmt(pRemain);
-    document.getElementById('pModeLabel').textContent = 'focus';
-    document.getElementById('pPlayIcon').style.display = 'block';
-    document.getElementById('pPauseIcon').style.display = 'none';
-    pUpdateRing(1); pRenderDots();
-  }
-
-  document.getElementById('pRingProg').style.strokeDasharray = P_CIRC;
-  document.getElementById('pRingProg').style.strokeDashoffset = 0;
+  updateClock();
+  setInterval(updateClock, 1000);
 
   /* ══════════════════════════════════════
      MATRIX RAIN — Canvas
